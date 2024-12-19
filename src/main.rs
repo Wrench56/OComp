@@ -1,10 +1,11 @@
+mod builder;
 mod config;
 
 use axum::{
+    extract::Multipart,
     routing::{get, post},
     Router,
 };
-use config::load_config;
 use const_format::formatcp;
 use std::sync::Arc;
 
@@ -14,24 +15,35 @@ static ADDRESS: &str = formatcp!("{SERVER_HOST}:{SERVER_PORT}");
 
 #[tokio::main]
 async fn main() {
-    let config = Arc::new(load_config());
+    let config = Arc::new(config::load_config());
+    builder::init().await;
+
     let mut app = Router::new();
 
-    for (key, _section) in &config.sections {
+    for (key, section) in &config.sections {
         let route_path = format!("/{}", key);
-        let config_clone = config.clone();
+        let _config_clone = config.clone();
+        let build_command = section.build.clone();
 
         app = app
             .route(
                 &route_path,
                 post({
-                    let build_type = key.clone();
-                    move || async move { format!("Building with {}", build_type) }
+                    let build_command = build_command.clone();
+                    move |multipart: Multipart| {
+                        let build_command = build_command.clone();
+                        async move {
+                            match builder::build(&build_command, multipart).await {
+                                Ok(output) => format!("Build success: \n{}", output),
+                                Err(err) => format!("Build failed: \n{}", err),
+                            }
+                        }
+                    }
                 }),
             )
             .route(
                 &route_path,
-                get("Please use HTTP POST to build source files"),
+                get("Please use HTTP POST with a source file to build"),
             );
     }
 

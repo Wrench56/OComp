@@ -49,7 +49,7 @@ pub fn load_config() -> Config {
     config
 }
 
-fn get_config_dir() -> PathBuf {
+pub fn get_config_dir() -> PathBuf {
     if cfg!(target_os = "windows") {
         PathBuf::from(std::env::var("APPDATA").unwrap_or_else(|_| "".to_string())).join("ocomp")
     } else {
