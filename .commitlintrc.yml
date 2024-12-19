@@ -22,6 +22,7 @@ rules:
       - commitlint
       - readme
       - tools
+      - config
   subject-empty:
     level: error
   type:
