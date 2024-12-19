@@ -4,6 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+const_format = "0.2.34"
+
 semver = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
+
+axum = "0.7"
+tokio = { version = "1.42", features = ["rt-multi-thread", "macros", "signal"] }
