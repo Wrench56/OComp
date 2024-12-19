@@ -23,6 +23,7 @@ rules:
       - readme
       - tools
       - config
+      - build
   subject-empty:
     level: error
   type:
